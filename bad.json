@@ -1,0 +1,8 @@
+{
+  "action": "create",
+  "resourceName": "<>",
+  "resourceDescription": "bad",
+  "resourceAvailable": true,
+  "resourcePrice": 25.5,
+  "resourcePriceUnit": "day"
+}
