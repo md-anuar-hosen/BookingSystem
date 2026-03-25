@@ -14,17 +14,14 @@ function getFormMessageEl() {
 
 /**
  * Show a success/error/info message in the UI.
- * type: "success" | "error" | "info"
  */
 function showFormMessage(type, message) {
   const el = getFormMessageEl();
   if (!el) return;
 
-  // Base styling
   el.className = "mt-6 rounded-2xl border px-4 py-3 text-sm whitespace-pre-line";
   el.classList.remove("hidden");
 
-  // Type-specific styling
   if (type === "success") {
     el.classList.add("border-emerald-200", "bg-emerald-50", "text-emerald-900");
   } else if (type === "info") {
@@ -44,11 +41,7 @@ function clearFormMessage() {
   el.classList.add("hidden");
 }
 
-// Timestamp
-function timestamp() {
-  const now = new Date();
-  return now.toISOString().replace("T", " ").replace("Z", "");
-}
+// ---------------- RESPONSE HELPER ----------------
 
 async function readResponseBody(response) {
   const contentType = response.headers.get("content-type") || "";
@@ -69,18 +62,21 @@ async function readResponseBody(response) {
   }
 }
 
-// -------------- Form wiring --------------
+// ---------------- FORM INIT ----------------
+
 document.addEventListener("DOMContentLoaded", () => {
   const form = $("resourceForm");
   if (!form) return;
   form.addEventListener("submit", onSubmit);
 });
 
+// ---------------- MAIN SUBMIT ----------------
+
 async function onSubmit(event) {
   event.preventDefault();
 
   const submitter = event.submitter;
-  const actionValue = submitter && submitter.value ? submitter.value : "create";
+  const actionValue = submitter?.value ?? "create";
 
   const selectedUnit =
     document.querySelector('input[name="resourcePriceUnit"]:checked')?.value ?? "";
@@ -108,46 +104,48 @@ async function onSubmit(event) {
 
     const body = await readResponseBody(response);
 
-    // -------------------------
-    // ERROR HANDLING
-    // -------------------------
+    // =========================
+    // ❌ ERROR HANDLING
+    // =========================
     if (!response.ok) {
 
-      // ✅ VALIDATION ERROR (400)
+      // 🔴 VALIDATION ERROR
       if (response.status === 400) {
-         const msg = buildValidationMessage(body?.errors);
-showFormMessage("error", msg);
+        const msg = buildValidationMessage(body?.errors);
+        showFormMessage("error", msg);
         return;
       }
 
-      // ✅ DUPLICATE ERROR (409)
+      // 🔴 DUPLICATE ERROR
       if (response.status === 409) {
         const name = payload.resourceName;
+
         showFormMessage(
           "error",
-          `A resource named "${name}" already exists. Please choose a different name.`
+          `⚠️ A resource named "${name}" already exists.\n\nPlease choose a different name or check your existing resources.`
         );
         return;
       }
 
-      // OTHER ERRORS
+      // 🔴 OTHER ERRORS
       showFormMessage(
         "error",
-        `Something went wrong (Error ${response.status}). Please try again.`
+        `⚠️ Something went wrong (Error ${response.status}). Please try again.`
       );
       return;
     }
 
-    // -------------------------
-    // SUCCESS
-    // -------------------------
+    // =========================
+    // ✅ SUCCESS
+    // =========================
     const name = body?.data?.name ?? "";
+
     showFormMessage(
       "success",
-      `Resource "${name}" was added successfully.`
+      `✅ Resource "${name}" was added successfully.\n\nYou can now manage or update it below.`
     );
 
-    // Optional callback
+    // callback
     if (typeof window.onResourceActionSuccess === "function") {
       window.onResourceActionSuccess({
         action: actionValue,
@@ -157,21 +155,29 @@ showFormMessage("error", msg);
 
   } catch (err) {
     console.error("POST error:", err);
+
     showFormMessage(
       "error",
-      "Network error: Could not reach the server. Please try again."
+      "⚠️ Network error: Unable to connect to the server.\n\nPlease check your connection and try again."
     );
   }
-} function buildValidationMessage(errors = []) {
+}
+
+// =========================
+// VALIDATION MESSAGE BUILDER
+// =========================
+function buildValidationMessage(errors = []) {
   if (!errors || errors.length === 0) {
-    return "Your request was blocked by server-side validation:";
+    return " Some input fields are invalid. Please check your entries and try again.";
   }
 
-  let msg = "Your request was blocked by server-side validation:\n\n";
+  let msg = " Please fix the following issues:\n\n";
 
-  for (const e of errors) {
-    msg += `• ${e.field}: ${e.msg}`;
-  }
+  errors.forEach((e) => {
+    msg += `• ${e.field}: ${e.msg}\n`;
+  });
 
-  return msg;
+  msg += "\nMake sure all fields follow the required format.";
+
+  return msg.trim();
 }
