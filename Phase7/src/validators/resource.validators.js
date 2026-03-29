@@ -3,21 +3,14 @@ import { body } from "express-validator";
 
 // Validation rules for POST /api/resources
 export const resourceValidators = [
-  body("action")
-    .exists({ checkFalsy: true })
-    .withMessage("action is required")
-    .trim()
-    .isIn(["create"])
-    .withMessage("action must be 'create'"),
-
   body("resourceName")
     .exists({ checkFalsy: true })
     .withMessage("resourceName is required")
     .isString()
     .withMessage("resourceName must be a string")
     .trim()
-    .matches(/^[A-Za-z0-9 ]+$/)
-    .withMessage("resourceName can only contain letters, numbers, and spaces")
+    .matches(/^[a-zA-Z0-9äöåÄÖÅ \,\.\-]+$/)
+    .withMessage("resourceName can only contain letters, numbers, spaces and symbols ,.-")
     .isLength({ min: 5, max: 30 })
     .withMessage("resourceName must be 5-30 characters"),
 
@@ -27,8 +20,8 @@ export const resourceValidators = [
     .isString()
     .withMessage("resourceDescription must be a string")
     .trim()
-    .matches(/^[A-Za-z0-9 ]+$/)
-    .withMessage("resourceDescription can only contain letters, numbers, and spaces")
+    .matches(/^[a-zA-Z0-9äöåÄÖÅ \,\.\-]+$/)
+    .withMessage("resourceDescription can only contain letters, numbers, spaces and symbols ,.-")
     .isLength({ min: 10, max: 50 })
     .withMessage("resourceDescription must be 10-50 characters"),
 

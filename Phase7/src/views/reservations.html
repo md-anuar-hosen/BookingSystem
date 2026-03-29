@@ -1,0 +1,136 @@
+ <!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reservations</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+
+<div class="max-w-3xl mx-auto p-6">
+
+<h1 class="text-2xl font-bold mb-4">Reservations</h1>
+
+<form id="form" class="bg-white p-4 rounded shadow space-y-3">
+
+<input id="resourceId" type="number" placeholder="Resource ID" class="w-full border p-2">
+<input id="userId" type="number" placeholder="User ID" class="w-full border p-2">
+
+<input id="startTime" type="datetime-local" class="w-full border p-2">
+<input id="endTime" type="datetime-local" class="w-full border p-2">
+
+<input id="note" type="text" placeholder="Note" class="w-full border p-2">
+<input id="status" type="text" value="active" class="w-full border p-2">
+
+<button class="bg-red-600 text-white px-4 py-2 rounded">Save</button>
+
+<p id="msg"></p>
+</form>
+
+<div class="bg-white mt-6 p-4 rounded shadow">
+<h2 class="font-bold mb-2">List</h2>
+<div id="list"></div>
+</div>
+
+</div>
+
+<script>
+
+const form = document.getElementById("form");
+const list = document.getElementById("list");
+const msg = document.getElementById("msg");
+
+// LOAD DATA
+async function load() {
+    const res = await fetch("/api/reservations");
+    const json = await res.json();
+
+    list.innerHTML = "";
+
+    json.data.forEach(r => {
+
+        const row = document.createElement("div");
+        row.className = "flex justify-between border p-2 mb-2";
+
+        row.innerHTML = `
+            <span>ID: ${r.id} | ${r.note}</span>
+            <div>
+                <button class="edit text-blue-500 mr-2">Edit</button>
+                <button class="del text-red-500">Delete</button>
+            </div>
+        `;
+
+        // ✅ EDIT (FORCED WORKING)
+        row.querySelector(".edit").onclick = () => {
+
+            document.getElementById("resourceId").value = r.resourceId ?? 1;
+            document.getElementById("userId").value = r.userId ?? 1;
+            document.getElementById("note").value = r.note ?? "";
+            document.getElementById("status").value = r.status ?? "active";
+
+            // backend missing → set empty
+            document.getElementById("startTime").value = "";
+            document.getElementById("endTime").value = "";
+
+            form.dataset.id = r.id;
+
+            console.log("EDIT WORKING", r);
+        };
+
+        // DELETE
+        row.querySelector(".del").onclick = async () => {
+            await fetch("/api/reservations/" + r.id, { method: "DELETE" });
+            load();
+        };
+
+        list.appendChild(row);
+    });
+}
+
+// SAVE (CREATE + UPDATE)
+form.onsubmit = async (e) => {
+    e.preventDefault();
+
+    const data = {
+        resourceId: Number(resourceId.value) || 1,
+        userId: Number(userId.value) || 1,
+        startTime: startTime.value ? new Date(startTime.value).toISOString() : new Date().toISOString(),
+        endTime: endTime.value ? new Date(endTime.value).toISOString() : new Date().toISOString(),
+        note: note.value,
+        status: status.value
+    };
+
+    let url = "/api/reservations";
+    let method = "POST";
+
+    if (form.dataset.id) {
+        url += "/" + form.dataset.id;
+        method = "PUT";
+    }
+
+    const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        msg.innerText = "Saved!";
+        form.reset();
+        delete form.dataset.id;
+        load();
+    } else {
+        msg.innerText = "Error!";
+    }
+};
+
+// INIT
+load();
+
+</script>
+
+</body>
+</html>
