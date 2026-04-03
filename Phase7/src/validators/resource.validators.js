@@ -1,4 +1,4 @@
-// src/validators/resource.validators.js
+ // src/validators/resource.validators.js
 import { body } from "express-validator";
 
 // Validation rules for POST /api/resources

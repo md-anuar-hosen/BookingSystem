@@ -1,4 +1,4 @@
-// src/routes/resources.routes.js
+ // src/routes/resources.routes.js
 import express from "express";
 import pool from "../db/pool.js";
 import { resourceValidators } from "../validators/resource.validators.js";

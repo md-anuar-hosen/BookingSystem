@@ -1,5 +1,4 @@
  <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -39,13 +38,25 @@
 
 <script>
 
+// ✅ AUTH CHECK
+const token = localStorage.getItem("token");
+
+if (!token) {
+    window.location.href = "/login.html";
+}
+
 const form = document.getElementById("form");
 const list = document.getElementById("list");
 const msg = document.getElementById("msg");
 
-// LOAD DATA
+// ✅ LOAD DATA
 async function load() {
-    const res = await fetch("/api/reservations");
+    const res = await fetch("/api/reservations", {
+        headers: {
+            Authorization: "Bearer " + token
+        }
+    });
+
     const json = await res.json();
 
     list.innerHTML = "";
@@ -63,26 +74,31 @@ async function load() {
             </div>
         `;
 
-        // ✅ EDIT (FORCED WORKING)
+        // ✅ EDIT
         row.querySelector(".edit").onclick = () => {
 
-            document.getElementById("resourceId").value = r.resourceId ?? 1;
-            document.getElementById("userId").value = r.userId ?? 1;
-            document.getElementById("note").value = r.note ?? "";
-            document.getElementById("status").value = r.status ?? "active";
+            resourceId.value = r.resource_id;
+            userId.value = r.user_id;
+            note.value = r.note || "";
+            status.value = r.status || "active";
 
-            // backend missing → set empty
-            document.getElementById("startTime").value = "";
-            document.getElementById("endTime").value = "";
+            startTime.value = r.start_time ? r.start_time.slice(0,16) : "";
+            endTime.value = r.end_time ? r.end_time.slice(0,16) : "";
 
+            // 🔴 IMPORTANT: enable update mode
             form.dataset.id = r.id;
 
-            console.log("EDIT WORKING", r);
+            console.log("Editing ID:", r.id);
         };
 
-        // DELETE
+        // ✅ DELETE
         row.querySelector(".del").onclick = async () => {
-            await fetch("/api/reservations/" + r.id, { method: "DELETE" });
+            await fetch("/api/reservations/" + r.id, {
+                method: "DELETE",
+                headers: {
+                    Authorization: "Bearer " + token
+                }
+            });
             load();
         };
 
@@ -90,7 +106,7 @@ async function load() {
     });
 }
 
-// SAVE (CREATE + UPDATE)
+// ✅ SAVE (CREATE + UPDATE)
 form.onsubmit = async (e) => {
     e.preventDefault();
 
@@ -106,19 +122,25 @@ form.onsubmit = async (e) => {
     let url = "/api/reservations";
     let method = "POST";
 
+    // 🔴 UPDATE MODE
     if (form.dataset.id) {
         url += "/" + form.dataset.id;
         method = "PUT";
     }
 
+    console.log("METHOD:", method, "URL:", url);
+
     const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+        },
         body: JSON.stringify(data)
     });
 
     if (res.ok) {
-        msg.innerText = "Saved!";
+        msg.innerText = method === "PUT" ? "Updated!" : "Saved!";
         form.reset();
         delete form.dataset.id;
         load();

@@ -1,4 +1,4 @@
-// src/routes/reservations.routes.js
+ // src/routes/reservations.routes.js
 import express from "express";
 import pool from "../db/pool.js";
 import { logEvent } from "../services/log.service.js";
@@ -30,10 +30,10 @@ router.post("/", async (req, res) => {
     `;
 
     const params = [
-      Number(resourceId),
-      Number(userId),
-      startTime,
-      endTime,
+      resourceId ? Number(resourceId) : null,
+      userId ? Number(userId) : null,
+      startTime || null,
+      endTime || null,
       note || null,
       status || "active"
     ];
@@ -62,9 +62,7 @@ router.post("/", async (req, res) => {
    GET /api/reservations
 ===================================================== */
 router.get("/", async (req, res) => {
-
   try {
-
     const sql = `
       SELECT
         r.*,
@@ -84,7 +82,6 @@ router.get("/", async (req, res) => {
     console.error("READ ALL failed:", err);
     return res.status(500).json({ ok: false, error: "Database error" });
   }
-
 });
 
 
@@ -101,7 +98,6 @@ router.get("/:id", async (req, res) => {
   }
 
   try {
-
     const sql = `
       SELECT
         r.*,
@@ -167,10 +163,10 @@ router.put("/:id", async (req, res) => {
     `;
 
     const params = [
-      Number(resourceId),
-      Number(userId),
-      startTime,
-      endTime,
+      resourceId ? Number(resourceId) : null,
+      userId ? Number(userId) : null,
+      startTime || null,
+      endTime || null,
       note || null,
       status || "active",
       id
@@ -241,6 +237,5 @@ router.delete("/:id", async (req, res) => {
   }
 
 });
-
 
 export default router;
