@@ -21,11 +21,7 @@ function FormPage() {
 
   function handleChange(e) {
     const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData({ ...formData, [name]: value });
   }
 
   async function handleSubmit(e) {
@@ -39,7 +35,6 @@ function FormPage() {
         newErrors[err.path[0]] = err.message;
       });
       setErrors(newErrors);
-      setResponse(null);
       return;
     }
 
@@ -59,135 +54,82 @@ function FormPage() {
       setResponse(data);
     } catch (error) {
       console.error(error);
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   }
 
   return (
     <>
       <Navbar />
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginTop: "50px",
-        }}
-      >
-        <div
-          style={{
-            width: "400px",
-            padding: "30px",
-            borderRadius: "12px",
-            boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
-            background: "#fff",
-          }}
-        >
-          <h2 style={{ marginBottom: "20px" }}>Submit Information</h2>
+      <div className="container">
+        
+        {/* LEFT SIDE (TEXT) */}
+        <div className="hero">
+          <span className="badge">Form Submission</span>
+          <h1>Submit Your Information Securely</h1>
+          <p className="description">
+            This form allows users to safely submit personal details. Data is
+            validated and sent securely to the server.
+          </p>
+        </div>
+
+        {/* RIGHT SIDE (FORM CARD) */}
+        <div className="card">
+          <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
+            Submit Information
+          </h2>
 
           <form onSubmit={handleSubmit}>
-            {/* NAME */}
-            <div style={{ marginBottom: "15px" }}>
-              <label>Name</label>
+            
+            <div className="form-group">
+              <label className="form-label">Name</label>
               <input
-                type="text"
+                className="form-input"
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  marginTop: "5px",
-                }}
               />
-              {errors.name && (
-                <p style={{ color: "red" }}>{errors.name}</p>
-              )}
+              {errors.name && <p className="error">{errors.name}</p>}
             </div>
 
-            {/* EMAIL */}
-            <div style={{ marginBottom: "15px" }}>
-              <label>Email</label>
+            <div className="form-group">
+              <label className="form-label">Email</label>
               <input
-                type="email"
+                className="form-input"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  marginTop: "5px",
-                }}
               />
-              {errors.email && (
-                <p style={{ color: "red" }}>{errors.email}</p>
-              )}
+              {errors.email && <p className="error">{errors.email}</p>}
             </div>
 
-            {/* AGE */}
-            <div style={{ marginBottom: "15px" }}>
-              <label>Age</label>
+            <div className="form-group">
+              <label className="form-label">Age</label>
               <input
                 type="number"
+                className="form-input"
                 name="age"
                 value={formData.age}
                 onChange={handleChange}
-                style={{
-                  width: "100%",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  marginTop: "5px",
-                }}
               />
-              {errors.age && (
-                <p style={{ color: "red" }}>{errors.age}</p>
-              )}
+              {errors.age && <p className="error">{errors.age}</p>}
             </div>
 
-            {/* BUTTON */}
-            <button
-              type="submit"
-              style={{
-                width: "100%",
-                padding: "12px",
-                background: "#e11d48",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                cursor: "pointer",
-                marginTop: "10px",
-              }}
-            >
-              Submit
+            <button type="submit" className="btn-primary">
+              {loading ? "Submitting..." : "Submit"}
             </button>
           </form>
 
-          {loading && <p style={{ marginTop: "10px" }}>Sending...</p>}
-
           {response && (
-            <div style={{ marginTop: "20px" }}>
+            <div className="response-box">
               <h3>Server Response</h3>
-              <pre
-                style={{
-                  background: "#111",
-                  color: "#0f0",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  fontSize: "12px",
-                  overflowX: "auto",
-                }}
-              >
-                {JSON.stringify(response.json, null, 2)}
-              </pre>
+              <pre>{JSON.stringify(response.json, null, 2)}</pre>
             </div>
           )}
         </div>
+
       </div>
     </>
   );

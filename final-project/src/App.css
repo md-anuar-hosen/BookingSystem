@@ -23,9 +23,18 @@
 .nav-bar {
   background: #111;
   color: white;
-  padding: 15px 20px;
 }
 
+.nav-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 15px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Logo */
 .logo {
   display: flex;
   align-items: center;
@@ -45,16 +54,35 @@
   margin: 0;
 }
 
+/* Nav links */
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+.nav-links a {
+  color: white;
+  text-decoration: none;
+}
+
+.nav-links a:hover {
+  text-decoration: underline;
+}
+
 /* Layout */
 .container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
+  gap: 60px;
   padding: 80px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* Hero */
 .hero {
+  flex: 1;
   max-width: 600px;
 }
 
@@ -66,7 +94,6 @@
 
 .description {
   color: #555;
-  margin-bottom: 20px;
 }
 
 .badge {
@@ -80,43 +107,68 @@
 
 /* Card */
 .card {
+  flex: 1;
+  max-width: 380px;
   background: #f9f9f9;
   padding: 25px;
   border-radius: 15px;
-  width: 350px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.form-title {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.guest {
-  background: #fce7e7;
-  padding: 5px 10px;
-  border-radius: 10px;
-  font-size: 12px;
-}
-
-/* Buttons */
-.buttons {
+/* Form */
+.form-group {
   margin-top: 15px;
 }
 
-.btn-primary {
-  background: #e11d48;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  margin-right: 10px;
-}
-
-.btn-secondary {
-  background: #eee;
-  padding: 10px 20px;
+.form-input {
+  width: 100%;
+  padding: 10px;
   border-radius: 8px;
   border: 1px solid #ccc;
+  margin-top: 5px;
+}
+
+/* Button */
+.buttons {
+  margin-top: 20px;
+}
+
+.btn-primary {
+  width: 100%;
+  background: #e11d48;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #be123c;
+}
+
+/* Errors */
+.error {
+  color: red;
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+/* Response */
+.response-box {
+  margin-top: 20px;
+}
+
+.response-box pre {
+  background: #111;
+  color: #0f0;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  overflow-x: auto;
 }
